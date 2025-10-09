@@ -1,31 +1,31 @@
-#include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-#define LED_PIN 2            // GPIO4 for LED
-hw_timer_t *My_timer = nullptr;
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_ADDR 0x3C
 
-// ---- Timer ISR ----
-void IRAM_ATTR onTimer() {
-  digitalWrite(LED_PIN, !digitalRead(LED_PIN));  // toggle LED
-}
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-// ---- Setup ----
 void setup() {
-  pinMode(LED_PIN, OUTPUT);
-
-  // timerBegin(timer number 0-3, prescaler, countUp)
-  // 80 MHz / 80 = 1 MHz → tick = 1 µs
-  My_timer = timerBegin(0, 80, true);
-
-  // attach ISR to timer, edge-triggered
-  timerAttachInterrupt(My_timer, &onTimer, true);
-
-  // trigger every 1 000 000 µs = 1 s
-  timerAlarmWrite(My_timer, 1000000, true);
-
-  // enable alarm
-  timerAlarmEnable(My_timer);
+  Wire.begin(21, 22);
+  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
+    for (;;);
+  }
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(10, 10);
+  display.println("OLED Display Demo");
+  display.display();
 }
 
 void loop() {
-  // main loop free for other code
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setCursor(25, 25);
+  display.println("CS-A");
+  display.display();
+  delay(1000);
 }
